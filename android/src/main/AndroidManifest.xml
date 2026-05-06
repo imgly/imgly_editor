@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="ly.img.editor.flutter.plugin">
+  <application>
+    <activity
+      android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+      android:name=".activity.EditorActivity" />
+  </application>
+</manifest>
