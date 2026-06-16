@@ -29,3 +29,7 @@ migrate_working_dir/
 build/
 
 # Starter kit sources are copied at pod install time (see podspec).
+
+# Starter kit sources are added to the source set at build time
+# via apps/cesdk_android_showcases/starter-kits/starter-kits-local.gradle
+# (see android/build.gradle), and copied in by publish tooling at release time.
