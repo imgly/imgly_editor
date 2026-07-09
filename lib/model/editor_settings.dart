@@ -31,7 +31,7 @@ class EditorSettings {
   EditorSettings(
       {this.license,
       this.baseUri =
-          "https://cdn.img.ly/packages/imgly/cesdk-flutter/1.76.1/assets",
+          "https://cdn.img.ly/packages/imgly/cesdk-flutter/1.77.0/assets",
       this.userId});
 
   /// Converts the instance to a `Map<String, dynamic>`

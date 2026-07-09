@@ -3,10 +3,6 @@ plugins {
     id 'kotlin-android'
 }
 
-def starterKitsGradleFilePath = "$projectDir/../../../../cesdk_android_showcases/starter-kits/starter-kits-local.gradle"
-if (file(starterKitsGradleFilePath).exists()) {
-    apply from: starterKitsGradleFilePath
-}
 
 def getKotlinVersion() {
     return project.plugins.findPlugin("kotlin-android")?.class?.package?.implementationVersion
@@ -85,7 +81,7 @@ android {
 }
 
 dependencies {
-    api "ly.img:editor:1.76.1"
+    api "ly.img:editor:1.77.0"
 
     implementation "androidx.activity:activity-ktx:1.9.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
