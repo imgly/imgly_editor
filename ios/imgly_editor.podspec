@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'imgly_editor'
-  s.version          = '1.79.0'
+  s.version          = '1.80.0-rc.1'
   s.summary          = 'CreativeEditor SDK editors for Flutter.'
   s.homepage         = 'https://img.ly'
   s.license          = { file: '../LICENSE' }
