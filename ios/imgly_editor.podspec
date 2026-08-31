@@ -4,16 +4,16 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'imgly_editor'
-  s.version          = '1.79.0'
+  s.version          = '1.82.0-rc.0'
   s.summary          = 'CreativeEditor SDK editors for Flutter.'
   s.homepage         = 'https://img.ly'
   s.license          = { file: '../LICENSE' }
   s.author           = { 'IMG.LY GmbH' => 'contact@img.ly' }
   s.source           = { path: '.' }
 
-  s.source_files = 'Classes/**/*', 'StarterKits/**/*.swift'
-  s.exclude_files = 'StarterKits/**/*StarterKit.swift'
-  s.resources = 'StarterKits/*.{scene,png}'
+  s.source_files = 'imgly_editor/Sources/imgly_editor/**/*.swift'
+  s.exclude_files = 'imgly_editor/Sources/imgly_editor/StarterKits/**/*StarterKit.swift'
+  s.resources = 'imgly_editor/Sources/imgly_editor/StarterKits/*.{scene,png}'
 
   s.dependency 'Flutter'
   s.dependency 'IMGLYUI', s.version.to_s
