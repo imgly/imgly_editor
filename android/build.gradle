@@ -1,11 +1,37 @@
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
 }
 
+// AGP 9 provides Kotlin unless the host opts out of built-in Kotlin.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+if (agpMajor < 9 || project.findProperty("android.builtInKotlin")?.toString() == "false") {
+    // This line causes a warning: Your app uses the following plugins that apply Kotlin Gradle Plugin (KGP): imgly_editor
+    // That's because Flutter’s checker is source-text based, not runtime-aware. Warning can safely be ignored.
+    apply plugin: 'kotlin-android'
+}
+
+// This module builds only the presets EditorBuilder exposes.
+ext.starterKitsInclude = ["apparel", "design", "photo", "postcard", "video"]
+
+
+def getSdkVersion(String overrideProperty, int fallback) {
+    def override = project.findProperty(overrideProperty)
+    return override == null ? fallback : Math.max(fallback, override.toString().toInteger())
+}
+
+// Flutter versions before 3.27 do not provide this extension to plugin modules.
+def flutterExtension = project.extensions.findByName("flutter")
+def compileSdkVersion = getSdkVersion("ly.img.flutter.compileSdkVersionOverride", flutterExtension?.compileSdkVersion ?: 34)
 
 def getKotlinVersion() {
-    return project.plugins.findPlugin("kotlin-android")?.class?.package?.implementationVersion
+    def kotlinAndroidPlugin = project.plugins.findPlugin("kotlin-android")
+    if (kotlinAndroidPlugin) {
+        return kotlinAndroidPlugin.class.package.implementationVersion
+    }
+
+    // AGP 9+ supplies built-in Kotlin, which is Kotlin 2 or higher.
+    def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+    return agpMajor >= 9 ? "2.0.0" : null
 }
 
 def isKotlin2OrHigher() {
@@ -26,6 +52,7 @@ def getComposeVersion() {
     return gradle.ext.has("kotlinCompilerExtensionVersion") ? gradle.ext.kotlinCompilerExtensionVersion : "1.5.3"
 }
 
+// Kotlin 2 requires the Compose Compiler Gradle plugin wherever Compose is enabled.
 if (isKotlin2OrHigher()) {
     try {
         project.plugins.apply('org.jetbrains.kotlin.plugin.compose')
@@ -42,19 +69,25 @@ android {
         namespace = "ly.img.editor.flutter.plugin"
     }
 
-    compileSdk = 34
+    compileSdk = compileSdkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
+    if (project.plugins.hasPlugin("kotlin-android")) {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 
     defaultConfig {
         minSdk = 24
+        aarMetadata {
+            // AGP 9 defaults this to compileSdk; declare the consumer requirement separately.
+            minCompileSdk = 34
+        }
     }
 
     testOptions {
@@ -81,7 +114,7 @@ android {
 }
 
 dependencies {
-    api "ly.img:editor:1.79.0"
+    api "ly.img:editor:1.83.0-rc.1"
 
     implementation "androidx.activity:activity-ktx:1.9.0"
     implementation "androidx.appcompat:appcompat:1.7.1"

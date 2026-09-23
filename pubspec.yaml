@@ -1,6 +1,6 @@
 name: imgly_editor
 description: "CreativeEditor SDK for Flutter - enable photo, video and design editing for your users on iOS and Android."
-version: 1.79.0
+version: 1.83.0-rc.1
 homepage: https://img.ly
 environment:
   sdk: '>=3.4.3 <4.0.0'
