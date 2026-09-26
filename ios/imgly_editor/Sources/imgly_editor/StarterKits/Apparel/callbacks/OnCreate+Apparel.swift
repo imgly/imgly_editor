@@ -1,10 +1,11 @@
+import CoreGraphics
 import Foundation
 import IMGLYEditor
 import IMGLYEngine
 
 // MARK: - Default OnCreate
 
-public extension DesignEditorConfiguration {
+public extension ApparelEditorConfiguration {
   /// The default `onCreate` handler.
   internal static var defaultOnCreateHandler: OnCreate.Handler {
     { engine, _ in
@@ -12,17 +13,17 @@ public extension DesignEditorConfiguration {
     }
   }
 
-  /// Default design editor specific `OnCreate.Callback` implementation with solution specific settings, scene
+  /// Default apparel editor specific `OnCreate.Callback` implementation with solution specific settings, scene
   /// and editor creation setup.
   /// - Parameters:
   ///   - preCreateScene: Callback to do any pre scene loading tasks such as applying settings.
-  ///   Defaults to `DesignEditorConfiguration.defaultPreCreateScene`.
+  ///   Defaults to `ApparelEditorConfiguration.defaultPreCreateScene`.
   ///   - createScene: Callback to load/create the scene and load asset sources. Defaults to
-  /// `DesignEditorConfiguration.defaultCreateScene`.
+  /// `ApparelEditorConfiguration.defaultCreateScene`.
   ///   - loadAssetSources: Callback to load any asset sources. Defaults to
-  /// `DesignEditorConfiguration.defaultLoadAssetSources`.
+  /// `ApparelEditorConfiguration.defaultLoadAssetSources`.
   ///   - postCreateScene: Callback to do any post scene loading tasks. Defaults to
-  ///   `DesignEditorConfiguration.defaultPostCreateScene`.
+  ///   `ApparelEditorConfiguration.defaultPostCreateScene`.
   /// - Returns: A composed `OnCreate.Callback`that sequentially executes all three initialization phases.
   static func defaultOnCreate(
     preCreateScene: @escaping OnCreate.Callback = defaultPreCreateScene,
@@ -67,13 +68,15 @@ public extension DesignEditorConfiguration {
     }
   }
 
-  /// Loads the built-in empty design scene.
+  /// Loads the built-in empty apparel scene.
   static let defaultCreateScene: OnCreate.Callback = { engine in
     // highlight-starter-kit-on-create-scene
-    let sceneURL = Bundle(for: DesignEditorConfiguration.self).url(
-      forResource: "design-ui-empty",
-      withExtension: "scene",
-    )!
+    #if SWIFT_PACKAGE
+      let bundle = Bundle.module
+    #else
+      let bundle = Bundle(for: ApparelEditorConfiguration.self)
+    #endif
+    let sceneURL = bundle.url(forResource: "apparel-ui-b-empty", withExtension: "scene")!
     try await engine.scene.load(from: sceneURL)
     // highlight-starter-kit-on-create-scene
   }
@@ -109,16 +112,81 @@ public extension DesignEditorConfiguration {
     // highlight-starter-kit-on-load-asset-sources
   }
 
-  /// Configures stack layout, clears selection, and enables page carousel.
+  /// Configures apparel-specific outline and page clipping behavior.
   static let defaultPostCreateScene: OnCreate.Callback = { engine in
-    if let stack = try engine.block.find(byType: .stack).first {
-      try engine.block.setEnum(stack, property: "stack/axis", value: "Horizontal")
+    guard let scene = try engine.block.find(byType: .scene).first,
+          let page = try engine.scene.getPages().first
+    else {
+      return
     }
 
-    try engine.block.findAllSelected().forEach {
-      try engine.block.setSelected($0, selected: false)
-    }
+    // Add outline block for apparel shape visualization.
+    _ = try ApparelEditorConfiguration.addOutline(
+      "always-on-top-page-outline", for: page, to: scene, engine: engine,
+    )
+    try ApparelEditorConfiguration.showOutline(false, engine: engine)
 
-    try engine.editor.setSettingBool("features/pageCarouselEnabled", value: true)
+    // Temporarily enable scopes to configure page clipping.
+    let isFillChangeEnabled = try engine.block.isScopeEnabled(page, key: "fill/change")
+    let isLayerClippingEnabled = try engine.block.isScopeEnabled(page, key: "layer/clipping")
+    try engine.block.setScopeEnabled(page, key: "fill/change", enabled: true)
+    try engine.block.setScopeEnabled(page, key: "layer/clipping", enabled: true)
+
+    // Configure page appearance and clipping for apparel editing.
+    try engine.editor.setSettingBool("page/dimOutOfPageAreas", value: false)
+    try engine.block.setClipped(page, clipped: true)
+    try engine.block.setBool(page, property: "fill/enabled", value: false)
+    try ApparelEditorConfiguration.showOutline(false, engine: engine)
+
+    // Restore original scope states.
+    try engine.block.setScopeEnabled(page, key: "fill/change", enabled: isFillChangeEnabled)
+    try engine.block.setScopeEnabled(page, key: "layer/clipping", enabled: isLayerClippingEnabled)
+  }
+
+  // MARK: - Helpers
+
+  /// Adds an outline block for apparel shape visualization.
+  internal static func addOutline(
+    _ name: String? = nil,
+    for id: DesignBlockID,
+    to parent: DesignBlockID,
+    engine: Engine,
+  ) throws -> DesignBlockID {
+    let outline = try engine.block.create(.graphic)
+    let rect = try engine.block.createShape(.rect)
+    try engine.block.setShape(outline, shape: rect)
+
+    let height = try engine.block.getHeight(id)
+    let width = try engine.block.getWidth(id)
+
+    if let name {
+      try engine.block.setName(outline, name: name)
+    }
+    try engine.block.setHeightMode(outline, mode: .absolute)
+    try engine.block.setHeight(outline, value: height)
+    try engine.block.setWidthMode(outline, mode: .absolute)
+    try engine.block.setWidth(outline, value: width)
+    try engine.block.appendChild(to: parent, child: outline)
+
+    try engine.block.setBool(outline, property: "fill/enabled", value: false)
+    try engine.block.setBool(outline, property: "stroke/enabled", value: true)
+    try engine.block.setStrokeStyle(outline, style: .dotted)
+    try engine.block.setStrokeWidth(outline, width: 1.0)
+    try engine.block.setBlendMode(outline, mode: .difference)
+    try engine.block.setScopeEnabled(outline, key: "editor/select", enabled: false)
+    if let color = Color(cgColor: CGColor.imgly.white) {
+      try engine.block.setColor(outline, property: "stroke/color", color: color)
+    }
+    return outline
+  }
+
+  /// Shows or hides the outline block.
+  internal static func showOutline(_ isVisible: Bool, engine: Engine) throws {
+    guard let outline = engine.block.find(byName: "always-on-top-page-outline").first else {
+      throw EditorError("No outline block was found.")
+    }
+    try engine.block.setVisible(outline, visible: isVisible)
+    // Workaround: Trigger opacity to force refresh on "fast" devices.
+    try engine.block.setOpacity(outline, value: isVisible ? 1 : 0)
   }
 }
