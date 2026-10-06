@@ -1,10 +1,10 @@
+import Foundation
 import IMGLYEditor
 import IMGLYEngine
-import UIKit
 
 // MARK: - Default OnCreate
 
-public extension VideoEditorConfiguration {
+public extension DesignEditorConfiguration {
   /// The default `onCreate` handler.
   internal static var defaultOnCreateHandler: OnCreate.Handler {
     { engine, _ in
@@ -12,17 +12,17 @@ public extension VideoEditorConfiguration {
     }
   }
 
-  /// Default video editor specific `OnCreate.Callback` implementation with solution specific settings, scene
+  /// Default design editor specific `OnCreate.Callback` implementation with solution specific settings, scene
   /// and editor creation setup.
   /// - Parameters:
   ///   - preCreateScene: Callback to do any pre scene loading tasks such as applying settings.
-  ///   Defaults to `VideoEditorConfiguration.defaultPreCreateScene`.
+  ///   Defaults to `DesignEditorConfiguration.defaultPreCreateScene`.
   ///   - createScene: Callback to load/create the scene and load asset sources. Defaults to
-  /// `VideoEditorConfiguration.defaultCreateScene`.
+  /// `DesignEditorConfiguration.defaultCreateScene`.
   ///   - loadAssetSources: Callback to load any asset sources. Defaults to
-  /// `VideoEditorConfiguration.defaultLoadAssetSources`.
+  /// `DesignEditorConfiguration.defaultLoadAssetSources`.
   ///   - postCreateScene: Callback to do any post scene loading tasks. Defaults to
-  ///   `VideoEditorConfiguration.defaultPostCreateScene`.
+  ///   `DesignEditorConfiguration.defaultPostCreateScene`.
   /// - Returns: A composed `OnCreate.Callback`that sequentially executes all three initialization phases.
   static func defaultOnCreate(
     preCreateScene: @escaping OnCreate.Callback = defaultPreCreateScene,
@@ -40,7 +40,7 @@ public extension VideoEditorConfiguration {
 
   /// Configures engine settings before scene loading.
   ///
-  /// Sets editor role, touch gestures, camera clamping, gizmo handles, and global scopes.
+  /// Sets editor role, touch gestures, camera clamping, and global scopes.
   static let defaultPreCreateScene: OnCreate.Callback = { engine in
     try engine.editor.setRole("Adopter")
     try engine.editor.setSettingEnum("camera/clamping/overshootMode", value: "Center")
@@ -48,18 +48,9 @@ public extension VideoEditorConfiguration {
     let highlightColor: IMGLYEngine.Color = try engine.editor.getSettingColor("highlightColor")
     try engine.editor.setSettingColor("placeholderHighlightColor", color: highlightColor)
 
-    try engine.editor.setSettingBool("touch/singlePointPanning", value: false)
     try engine.editor.setSettingBool("touch/dragStartCanSelect", value: false)
-    try engine.editor.setSettingEnum("touch/pinchAction", value: "Scale")
-
-    try engine.editor.setSettingBool("controlGizmo/showMoveHandles", value: false)
-    try engine.editor.setSettingBool("controlGizmo/showRotateHandles", value: false)
-    try engine.editor.setSettingBool("controlGizmo/showScaleHandles", value: false)
-
-    try engine.editor.setSettingColor(
-      "page/innerBorderColor",
-      color: .init(cgColor: UIColor.lightGray.withAlphaComponent(0.5).cgColor)!,
-    )
+    try engine.editor.setSettingEnum("touch/pinchAction", value: "Zoom")
+    try engine.editor.setSettingEnum("touch/rotateAction", value: "None")
 
     try ([
       "appearance/adjustments", "appearance/filter", "appearance/effect",
@@ -76,10 +67,15 @@ public extension VideoEditorConfiguration {
     }
   }
 
-  /// Loads the built-in empty video scene.
+  /// Loads the built-in empty design scene.
   static let defaultCreateScene: OnCreate.Callback = { engine in
     // highlight-starter-kit-on-create-scene
-    let sceneURL = Bundle(for: VideoEditorConfiguration.self).url(forResource: "video-empty", withExtension: "scene")!
+    #if SWIFT_PACKAGE
+      let bundle = Bundle.module
+    #else
+      let bundle = Bundle(for: DesignEditorConfiguration.self)
+    #endif
+    let sceneURL = bundle.url(forResource: "design-ui-empty", withExtension: "scene")!
     try await engine.scene.load(from: sceneURL)
     // highlight-starter-kit-on-create-scene
   }
@@ -93,7 +89,7 @@ public extension VideoEditorConfiguration {
       "ly.img.sticker", "ly.img.vector.shape", "ly.img.filter", "ly.img.color.palette",
       "ly.img.effect", "ly.img.blur", "ly.img.typeface", "ly.img.crop.presets",
       "ly.img.page.presets", "ly.img.text", "ly.img.text.styles", "ly.img.text.curves", "ly.img.text.components",
-      "ly.img.image", "ly.img.video", "ly.img.audio",
+      "ly.img.image",
     ]
     try await withThrowingTaskGroup(of: String.self) { group in
       for id in sourceIDs {
@@ -106,19 +102,25 @@ public extension VideoEditorConfiguration {
       for try await _ in group {}
     }
 
-    let uploadSources: [(id: String, mimeTypes: [String])] = [
-      ("ly.img.image.upload", ["image/jpeg", "image/png", "image/svg+xml", "image/gif", "image/apng", "image/bmp"]),
-      ("ly.img.audio.upload", ["audio/mpeg", "audio/mp4", "audio/wav", "audio/x-wav", "audio/ogg", "audio/aac"]),
-      ("ly.img.video.upload", ["video/mp4", "video/quicktime"]),
-    ]
-    for source in uploadSources {
-      try engine.asset.addLocalSource(sourceID: source.id, supportedMimeTypes: source.mimeTypes)
-    }
+    try engine.asset.addLocalSource(
+      sourceID: "ly.img.image.upload",
+      supportedMimeTypes: ["image/jpeg", "image/png", "image/svg+xml", "image/gif", "image/apng", "image/bmp"],
+    )
 
     try engine.asset.addSource(PhotoRollAssetSource(engine: engine))
     // highlight-starter-kit-on-load-asset-sources
   }
 
-  /// No additional post-scene configuration needed for video editor.
-  static let defaultPostCreateScene: OnCreate.Callback = { _ in }
+  /// Configures stack layout, clears selection, and enables page carousel.
+  static let defaultPostCreateScene: OnCreate.Callback = { engine in
+    if let stack = try engine.block.find(byType: .stack).first {
+      try engine.block.setEnum(stack, property: "stack/axis", value: "Horizontal")
+    }
+
+    try engine.block.findAllSelected().forEach {
+      try engine.block.setSelected($0, selected: false)
+    }
+
+    try engine.editor.setSettingBool("features/pageCarouselEnabled", value: true)
+  }
 }
