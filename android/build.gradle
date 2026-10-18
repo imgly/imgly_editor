@@ -3,6 +3,9 @@ plugins {
     id 'kotlin-android'
 }
 
+// This module builds only the presets EditorBuilder exposes.
+ext.starterKitsInclude = ["apparel", "design", "photo", "postcard", "video"]
+
 
 def getKotlinVersion() {
     return project.plugins.findPlugin("kotlin-android")?.class?.package?.implementationVersion
@@ -81,7 +84,7 @@ android {
 }
 
 dependencies {
-    api "ly.img:editor:1.79.0"
+    api "ly.img:editor:1.82.3-rc.0"
 
     implementation "androidx.activity:activity-ktx:1.9.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
