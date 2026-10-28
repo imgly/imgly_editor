@@ -31,14 +31,11 @@ class EditorSettings {
   EditorSettings(
       {this.license,
       this.baseUri =
-          "https://cdn.img.ly/packages/imgly/cesdk-flutter/1.79.0/assets",
+          "https://cdn.img.ly/packages/imgly/cesdk-flutter/1.85.0/assets",
       this.userId});
 
   /// Converts the instance to a `Map<String, dynamic>`
   /// for JSON encoding.
-  Map<String, dynamic> toJson() => {
-        "license": license,
-        "baseUri": baseUri,
-        "userId": userId
-      };
+  Map<String, dynamic> toJson() =>
+      {"license": license, "baseUri": baseUri, "userId": userId};
 }

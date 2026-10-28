@@ -4,7 +4,7 @@ import IMGLYEngine
 
 // MARK: - Default OnCreate
 
-public extension PhotoEditorConfiguration {
+public extension DesignEditorConfiguration {
   /// The default `onCreate` handler.
   internal static var defaultOnCreateHandler: OnCreate.Handler {
     { engine, _ in
@@ -12,17 +12,17 @@ public extension PhotoEditorConfiguration {
     }
   }
 
-  /// Default photo editor specific `OnCreate.Callback` implementation with solution specific settings, scene
+  /// Default design editor specific `OnCreate.Callback` implementation with solution specific settings, scene
   /// and editor creation setup.
   /// - Parameters:
   ///   - preCreateScene: Callback to do any pre scene loading tasks such as applying settings.
-  ///   Defaults to `PhotoEditorConfiguration.defaultPreCreateScene`.
+  ///   Defaults to `DesignEditorConfiguration.defaultPreCreateScene`.
   ///   - createScene: Callback to load/create the scene and load asset sources. Defaults to
-  /// `PhotoEditorConfiguration.defaultCreateScene`.
+  /// `DesignEditorConfiguration.defaultCreateScene`.
   ///   - loadAssetSources: Callback to load any asset sources. Defaults to
-  /// `PhotoEditorConfiguration.defaultLoadAssetSources`.
+  /// `DesignEditorConfiguration.defaultLoadAssetSources`.
   ///   - postCreateScene: Callback to do any post scene loading tasks. Defaults to
-  ///   `PhotoEditorConfiguration.defaultPostCreateScene`.
+  ///   `DesignEditorConfiguration.defaultPostCreateScene`.
   /// - Returns: A composed `OnCreate.Callback`that sequentially executes all three initialization phases.
   static func defaultOnCreate(
     preCreateScene: @escaping OnCreate.Callback = defaultPreCreateScene,
@@ -52,6 +52,9 @@ public extension PhotoEditorConfiguration {
     try engine.editor.setSettingEnum("touch/pinchAction", value: "Zoom")
     try engine.editor.setSettingEnum("touch/rotateAction", value: "None")
 
+    // Press and hold an image, then drag it onto another image to exchange the two.
+    try engine.editor.setSettingBool("dragToSwapFills/enabled", value: true)
+
     try ([
       "appearance/adjustments", "appearance/filter", "appearance/effect",
       "appearance/blur", "appearance/shadow",
@@ -67,11 +70,16 @@ public extension PhotoEditorConfiguration {
     }
   }
 
-  /// Creates a scene from the default photo image.
+  /// Loads the built-in empty design scene.
   static let defaultCreateScene: OnCreate.Callback = { engine in
     // highlight-starter-kit-on-create-scene
-    let imageURL = Bundle(for: PhotoEditorConfiguration.self).url(forResource: "photo-ui-empty", withExtension: "png")!
-    try await engine.scene.create(fromImage: imageURL)
+    #if SWIFT_PACKAGE
+      let bundle = Bundle.module
+    #else
+      let bundle = Bundle(for: DesignEditorConfiguration.self)
+    #endif
+    let sceneURL = bundle.url(forResource: "design-ui-empty", withExtension: "scene")!
+    try await engine.scene.load(from: sceneURL)
     // highlight-starter-kit-on-create-scene
   }
 
@@ -80,14 +88,14 @@ public extension PhotoEditorConfiguration {
     // highlight-starter-kit-on-load-asset-sources
     let basePath = try engine.editor.getSettingString("basePath")
     guard let baseURL = URL(string: basePath) else { return }
-    let defaultSourceIDs = [
+    let sourceIDs = [
       "ly.img.sticker", "ly.img.vector.shape", "ly.img.filter", "ly.img.color.palette",
       "ly.img.effect", "ly.img.blur", "ly.img.typeface", "ly.img.crop.presets",
       "ly.img.page.presets", "ly.img.text", "ly.img.text.styles", "ly.img.text.curves", "ly.img.text.components",
       "ly.img.image",
     ]
     try await withThrowingTaskGroup(of: String.self) { group in
-      for id in defaultSourceIDs {
+      for id in sourceIDs {
         group.addTask {
           try await engine.asset.addLocalAssetSourceFromJSON(
             baseURL.appendingPathComponent(id).appendingPathComponent("content.json"),
@@ -97,36 +105,25 @@ public extension PhotoEditorConfiguration {
       for try await _ in group {}
     }
 
+    try engine.asset.addLocalSource(
+      sourceID: "ly.img.image.upload",
+      supportedMimeTypes: ["image/jpeg", "image/png", "image/svg+xml", "image/gif", "image/apng", "image/bmp"],
+    )
+
     try engine.asset.addSource(PhotoRollAssetSource(engine: engine))
     // highlight-starter-kit-on-load-asset-sources
   }
 
-  /// Configures photo-specific page and crop behavior.
+  /// Configures stack layout, clears selection, and enables page carousel.
   static let defaultPostCreateScene: OnCreate.Callback = { engine in
-    let page = try getSinglePage(engine)
-
-    try engine.editor.setHighlightingEnabled(page, enabled: false)
-    try engine.block.setScopeEnabled(page, key: "layer/move", enabled: false)
-
-    try engine.editor.setSettingBool("page/highlightWhenCropping", value: true)
-    try engine.editor.setSettingBool("page/allowMoveInteraction", value: true)
-    try engine.editor.setSettingBool("page/selectWhenNoBlocksSelected", value: true)
-    try engine.editor.setSettingBool("doubleClickToCropEnabled", value: false)
-  }
-
-  // MARK: - Helpers
-
-  /// Gets the single page with an image fill from the scene.
-  internal static func getSinglePage(_ engine: Engine, withImageFill: Bool = true) throws -> DesignBlockID {
-    let pages = try engine.scene.getPages()
-    guard let page = pages.first, pages.count == 1 else {
-      throw EditorError("A single page is required for this operation.")
+    if let stack = try engine.block.find(byType: .stack).first {
+      try engine.block.setEnum(stack, property: "stack/axis", value: "Horizontal")
     }
-    if withImageFill {
-      guard try engine.block.getType(engine.block.getFill(page)) == FillType.image.rawValue else {
-        throw EditorError("A single page with an image fill is required for this operation.")
-      }
+
+    try engine.block.findAllSelected().forEach {
+      try engine.block.setSelected($0, selected: false)
     }
-    return page
+
+    try engine.editor.setSettingBool("features/pageCarouselEnabled", value: true)
   }
 }
