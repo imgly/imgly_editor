@@ -133,7 +133,10 @@ public class IMGLYEditorPlugin: NSObject, FlutterPlugin {
     presentationController = MainActor.assumeIsolated {
       builder(settings, preset, metadata) { [weak self] result in
         completion(result)
-        self?.presentationController?.presentingViewController?.dismiss(animated: true)
+        // Release the editor, otherwise it stays alive and keeps playing until the next openEditor.
+        let controller = self?.presentationController
+        self?.presentationController = nil
+        controller?.presentingViewController?.dismiss(animated: true)
       }
     }
     presentationController?.modalPresentationStyle = .fullScreen
