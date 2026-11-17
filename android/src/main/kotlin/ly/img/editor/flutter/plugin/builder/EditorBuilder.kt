@@ -436,7 +436,7 @@ object EditorBuilderDefaults {
     }
 
     private suspend fun saveScene(scene: String): Uri = withContext(Dispatchers.IO) {
-        val file = File.createTempFile("cesdk_export_scene_" + UUID.randomUUID().toString(), ".scene")
+        val file = File.createTempFile("cesdk_export_scene_" + UUID.randomUUID().toString(), ".imgly")
         file.writeText(scene)
         Uri.fromFile(file)
     }
