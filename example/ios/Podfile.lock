@@ -1,30 +1,30 @@
 PODS:
   - Flutter (1.0.0)
-  - imgly_editor (1.79.0):
+  - imgly_editor (1.80.0):
     - Flutter
-    - IMGLYUI (= 1.79.0)
-  - IMGLYApparelEditor (1.79.0):
-    - IMGLYEditor (= 1.79.0)
-  - IMGLYCamera (1.79.0):
-    - IMGLYCoreUI (= 1.79.0)
-  - IMGLYCore (1.79.0):
-    - IMGLYEngine (= 1.79.0)
-  - IMGLYCoreUI (1.79.0):
-    - IMGLYCore (= 1.79.0)
+    - IMGLYUI (= 1.80.0)
+  - IMGLYApparelEditor (1.80.0):
+    - IMGLYEditor (= 1.80.0)
+  - IMGLYCamera (1.80.0):
+    - IMGLYCoreUI (= 1.80.0)
+  - IMGLYCore (1.80.0):
+    - IMGLYEngine (= 1.80.0)
+  - IMGLYCoreUI (1.80.0):
+    - IMGLYCore (= 1.80.0)
     - Kingfisher (>= 7.10.0)
     - SwiftUIIntrospect (~> 1.1.2)
-  - IMGLYDesignEditor (1.79.0):
-    - IMGLYEditor (= 1.79.0)
-  - IMGLYEditor (1.79.0):
-    - IMGLYCamera (= 1.79.0)
-  - IMGLYEngine (1.79.0)
-  - IMGLYPhotoEditor (1.79.0):
-    - IMGLYEditor (= 1.79.0)
-  - IMGLYPostcardEditor (1.79.0):
-    - IMGLYEditor (= 1.79.0)
-  - IMGLYUI (1.79.0):
-    - IMGLYUI/All (= 1.79.0)
-  - IMGLYUI/All (1.79.0):
+  - IMGLYDesignEditor (1.80.0):
+    - IMGLYEditor (= 1.80.0)
+  - IMGLYEditor (1.80.0):
+    - IMGLYCamera (= 1.80.0)
+  - IMGLYEngine (1.80.0)
+  - IMGLYPhotoEditor (1.80.0):
+    - IMGLYEditor (= 1.80.0)
+  - IMGLYPostcardEditor (1.80.0):
+    - IMGLYEditor (= 1.80.0)
+  - IMGLYUI (1.80.0):
+    - IMGLYUI/All (= 1.80.0)
+  - IMGLYUI/All (1.80.0):
     - IMGLYUI/ApparelEditor
     - IMGLYUI/Camera
     - IMGLYUI/Core
@@ -34,26 +34,26 @@ PODS:
     - IMGLYUI/PhotoEditor
     - IMGLYUI/PostcardEditor
     - IMGLYUI/VideoEditor
-  - IMGLYUI/ApparelEditor (1.79.0):
-    - IMGLYApparelEditor (= 1.79.0)
-  - IMGLYUI/Camera (1.79.0):
-    - IMGLYCamera (= 1.79.0)
-  - IMGLYUI/Core (1.79.0):
-    - IMGLYCore (= 1.79.0)
-  - IMGLYUI/CoreUI (1.79.0):
-    - IMGLYCoreUI (= 1.79.0)
-  - IMGLYUI/DesignEditor (1.79.0):
-    - IMGLYDesignEditor (= 1.79.0)
-  - IMGLYUI/Editor (1.79.0):
-    - IMGLYEditor (= 1.79.0)
-  - IMGLYUI/PhotoEditor (1.79.0):
-    - IMGLYPhotoEditor (= 1.79.0)
-  - IMGLYUI/PostcardEditor (1.79.0):
-    - IMGLYPostcardEditor (= 1.79.0)
-  - IMGLYUI/VideoEditor (1.79.0):
-    - IMGLYVideoEditor (= 1.79.0)
-  - IMGLYVideoEditor (1.79.0):
-    - IMGLYEditor (= 1.79.0)
+  - IMGLYUI/ApparelEditor (1.80.0):
+    - IMGLYApparelEditor (= 1.80.0)
+  - IMGLYUI/Camera (1.80.0):
+    - IMGLYCamera (= 1.80.0)
+  - IMGLYUI/Core (1.80.0):
+    - IMGLYCore (= 1.80.0)
+  - IMGLYUI/CoreUI (1.80.0):
+    - IMGLYCoreUI (= 1.80.0)
+  - IMGLYUI/DesignEditor (1.80.0):
+    - IMGLYDesignEditor (= 1.80.0)
+  - IMGLYUI/Editor (1.80.0):
+    - IMGLYEditor (= 1.80.0)
+  - IMGLYUI/PhotoEditor (1.80.0):
+    - IMGLYPhotoEditor (= 1.80.0)
+  - IMGLYUI/PostcardEditor (1.80.0):
+    - IMGLYPostcardEditor (= 1.80.0)
+  - IMGLYUI/VideoEditor (1.80.0):
+    - IMGLYVideoEditor (= 1.80.0)
+  - IMGLYVideoEditor (1.80.0):
+    - IMGLYEditor (= 1.80.0)
   - integration_test (0.0.1):
     - Flutter
   - Kingfisher (8.11.0)
@@ -89,20 +89,20 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/integration_test/ios"
 
 SPEC CHECKSUMS:
-  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  imgly_editor: 15f6ee55ada6f6986e35cc93942fb3a0628ec552
-  IMGLYApparelEditor: ea2c851302b4e2970fd72b6bc492eeedffd04f95
-  IMGLYCamera: a4fee8b749f20d629dadaf5d505a0599f717142b
-  IMGLYCore: 93386a9bc8a9d9d971e3ca2d03ec469f2353cb5e
-  IMGLYCoreUI: 50c377b2f0cac1fabb9248be8c04b9ea9de91c22
-  IMGLYDesignEditor: 318619bc1a3e8868b58d6c328b16714689c159a8
-  IMGLYEditor: 355430260f86d715e69189b383ee27b46be310ac
-  IMGLYEngine: a5ddc61a9f40f7434b457aa1cc6ed0a45134ddd0
-  IMGLYPhotoEditor: 550c0a4f49e4a0972848cad20fdb2da9e0247f04
-  IMGLYPostcardEditor: 271165a19f95b8a14db1fb59b45eee12435d42f8
-  IMGLYUI: a387178a38beb1559bb9d6479e2421ad1ee3fc85
-  IMGLYVideoEditor: 551b7a0dc42c6e9fec515de5b9388d089743b5c9
-  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  imgly_editor: 1cea935a756b053f5caf9056885afb6c5a2fe43f
+  IMGLYApparelEditor: 6b6551884afb3fb5c991462c627affa2f959dd0b
+  IMGLYCamera: c086873fd8760cbbac185899b7f06b28122ed63f
+  IMGLYCore: 0a85e90eeebf373ce4e70f79c9bd5533c24e57b0
+  IMGLYCoreUI: e43cb51eb99622cdeef4e36d958643ecd19a5800
+  IMGLYDesignEditor: 1461350607e80a84617f59ca71f30d0306312eee
+  IMGLYEditor: 1c9d3574965f6592f13800147a830666ec434a77
+  IMGLYEngine: b1825d3fd759afcbf14ad052405e3e9e021a994e
+  IMGLYPhotoEditor: 65bd7ed63091c7d771f7885261514a2fc6b6effb
+  IMGLYPostcardEditor: 87a41c011b94b50777c79c1378f73160fc869512
+  IMGLYUI: dfbd20484715b78e373dd6cb9a898201a47fa9f2
+  IMGLYVideoEditor: 5cf9b5368b36beccf0da14bab32e52545a63dcb8
+  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
   Kingfisher: ee4ff4936d5b399164b6d01a0dfc0388583287b6
   SwiftUIIntrospect: 434b406dc6f5e30744bb6e180f90343f6a8eba8c
 
